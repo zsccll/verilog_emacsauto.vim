@@ -11,12 +11,12 @@ There are several issues in origional version:
 
 ### vim-plug
 ```vimscript
-Plug 'zhuzhzh/verilog_emacsauto.vim', {'for': ['verilog', 'systemverilog'] }
+Plug 'zsccll/verilog_emacsauto.vim', {'for': ['verilog', 'systemverilog'] }
 ```
 
 ### Vundle
 ```vimscript
-Plugin 'zhuzhzh/verilog_emacsauto.vim'
+Plugin 'zsccll/verilog_emacsauto.vim'
 ```
 
 ## Windows
