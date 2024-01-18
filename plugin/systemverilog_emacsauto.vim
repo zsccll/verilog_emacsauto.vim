@@ -1,7 +1,7 @@
 " Vim filetype plugin for using emacs verilog-mode
-" Last Change: 2018 August 28
+" Last Change: 2024 1/18
 " Origin Author:  Seong Kang <seongk@wwcoms.com>
-" Author: Harris Zhu <zhuzhzh@163.com>
+" Author: zsccll 
 " License:     This file is placed in the public domain.
 
 " comment out these two lines
@@ -28,6 +28,7 @@ call s:InitVar('g:VerilogModeAddKey', '<leader>a')
 call s:InitVar('g:VerilogModeDeleteKey', '<leader>d')
 call s:InitVar('g:VerilogModeFile', s_DefaultPath)
 call s:InitVar('g:VerilogModeTrace', 0)
+call s:InitVar('g:VerilogModeEmacsDefault', 1)
 
 "if !hasmapto('<Plug>VerilogEmacsAutoAdd')
 "map <unique> <leader>a <Plug>VerilogEmacsAutoAdd
@@ -55,11 +56,27 @@ noremap <unique> <script> <Plug>VerilogEmacsAutoAdd    <SID>Add
 noremap <unique> <script> <Plug>VerilogEmacsAutoDelete <SID>Delete
 noremap <SID>Add    :call <SID>Add()<CR>
 noremap <SID>Delete :call <SID>Delete()<CR>
+noremap <SID>Add_Debug    :call <SID>Add_Debug()<CR>
+noremap <SID>Delete_Debug :call <SID>Delete_Debug()<CR>
+noremap <SID>EN_Default :call <SID>EN_Default()<CR>
+noremap <SID>Dis_Default :call <SID>Dis_Default()<CR>
+
+
 " add menu items for gvim
 noremenu <script> Verilog-Mode.AddAuto    <SID>Add
 noremenu <script> Verilog-Mode.DeleteAuto <SID>Delete
 
 let s:is_win = has('win16') || has('win32') || has('win64')
+
+function s:EN_Default()
+   let g:VerilogModeEmacsDefault = 1
+   echo "set default mode"
+endfunction
+
+function s:Dis_Default()
+   let g:VerilogModeEmacsDefault = 0
+   echo "set file mode"
+endfunction
 
 " Add function
 " saves current document to a temporary file
@@ -92,7 +109,7 @@ function s:Add()
    "call deletebufline('.', 1, '$')
    let l:i=1
    call setline(1, l:newcontent)
-   exec "silent !rm " . shellescape(l:tmpfile)
+   exec "silent !rm -rf " . shellescape(l:tmpfile)
    w! %
    exec 'redraw!'
 endfunction
@@ -114,9 +131,29 @@ function s:Delete()
 	   exec "silent !emacs -batch --no-site-file -l " . g:VerilogModeFile . " " . l:tmpfile . " -f verilog-batch-delete-auto 2> /dev/null"
    endif
    exec "silent %!cat " . shellescape(l:tmpfile)
-   exec "silent !rm " . shellescape(l:tmpfile)
+   exec "silent !rm -rf " . shellescape(l:tmpfile)
    w! %
    exec 'redraw!'
+endfunction
+
+function s:Add_Debug()
+   if g:VerilogModeEmacsDefault
+      echo "default mode auto"
+      exec "!emacs -batch % -f verilog-auto -f save-buffer"
+   else
+      echo "file mode auto"
+      exec "!emacs -batch % -l " . g:VerilogModeFile . " -f verilog-auto -f save-buffer"   
+   endif
+endfunction
+
+function s:Delete_Debug()
+   if g:VerilogModeEmacsDefault
+      echo "default mode deleteauto"
+      exec "!emacs -batch % -f verilog-delete-auto -f save-buffer"
+   else
+      echo "file mode deleteauto"
+      exec "!emacs -batch % -l " . g:VerilogModeFile . " -f verilog-delete-auto -f save-buffer"   
+   endif
 endfunction
 
 " VerilogEmacsAutoFoldLevel function
